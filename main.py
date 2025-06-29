@@ -1,8 +1,8 @@
 from bacteria import Bacteria
-from ambiente import Ambiente
+from ambiente import Ambiente, Colonia
 import numpy as np
 
-def grilla_puntos(grilla): # grilla más clara con puntos
+def grilla_puntos(grilla): # Grilla con puntos
     for fila in grilla:
         for objeto in fila:
             if isinstance(objeto, Bacteria):
@@ -32,15 +32,29 @@ bacteria2 = Bacteria(
 )
 
 ambiente = Ambiente(filas=5, columnas=5)
+colonia = Colonia(ambiente)
 
 ambiente.grilla[0, 0] = bacteria1
 ambiente.grilla[1, 2] = bacteria2
 
-bacteria2.morir() # Bacteria2 muere por falta de energía
-nueva_bacteria = bacteria1.dividirse() # Crear una nueva bacteria
-ambiente.grilla[1, 1] = nueva_bacteria
-
 print("Estado inicial de la grilla:")
 grilla_puntos(ambiente.grilla)
 
-print(f"\nenergia de bacteria1: {bacteria1.energia}, energia de nueva_bacteria: {nueva_bacteria.energia}")
+bacteria2.morir() # Bacteria2 muere por falta de energía
+
+# Bacteria1 se divide:
+hija = bacteria1.dividirse()
+
+if hija:
+    # Obtener posición de la madre (esto sí lo sabe el ambiente)
+    madre_fila, madre_col = 0, 0  # Ejemplo, en realidad debes buscar en la grilla
+    
+    if colonia.ubicar_hija(madre_fila, madre_col, hija):
+        print("Bacteria se ha dividido y la hija ha sido ubicada en la grilla.")
+    else:
+        print("No había espacio para dividirse.")
+
+print("Estado final de la grilla:")
+grilla_puntos(ambiente.grilla)
+
+print(f"\nenergia de bacteria1: {bacteria1.energia}, energia de nueva_bacteria: {hija.energia if hija else 'N/A'}")

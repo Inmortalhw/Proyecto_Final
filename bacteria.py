@@ -20,14 +20,13 @@ class Bacteria:
             energia_division = self.energia // 2 # Divide su energía a la mitad
             self.energia = energia_division
 
-            nueva_bacteria = Bacteria(
+            return Bacteria(
                 id=f"{self.id}-hija",
                 raza=self.raza,
                 energia=energia_division,
                 resistente=self.resistente,
                 estado="activa"
             )
-            return nueva_bacteria
         else:
             print(f"{self.id} no tiene suficiente energía para dividirse.")
             return None
