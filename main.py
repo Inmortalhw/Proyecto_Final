@@ -1,7 +1,18 @@
 from bacteria import Bacteria
 from ambiente import Ambiente
+import numpy as np
 
-bacteria1 = Bacteria(
+def grilla_puntos(grilla): # grilla más clara con puntos
+    for fila in grilla:
+        for objeto in fila:
+            if isinstance(objeto, Bacteria):
+                print("BR" if objeto.resistente else "B", end=" ")
+            else:
+                print(".", end=" ") # Espacios vacios con punto
+        print()
+
+# Bacteria no resistente
+bacteria1 = Bacteria( 
     id="bact-1",
     raza="E. coli",
     energia=50,
@@ -9,39 +20,19 @@ bacteria1 = Bacteria(
     estado="activa"
 )
 
-print(f"Bacteria ID: {bacteria1.id}")
-print(f"Bacteria Raza: {bacteria1.raza}")
-print(f"Bacteria Energía: {bacteria1.energia}")
-print(f"Bacteria Resistente: {bacteria1.resistente}")
-print(f"Bacteria Estado: {bacteria1.estado}")
+# Bacteria resistente
+bacteria2 = Bacteria(
+    id="bact-2",
+    raza="Salmonella",
+    energia=30,
+    resistente=True,
+    estado="activa"
+)
 
-#Grilla base del ambiente 
 ambiente = Ambiente(filas=5, columnas=5)
 
-#Grilla vacia
-print("grilla inicial")
-print(ambiente.grilla)
+ambiente.grilla[0][0] = bacteria1
+ambiente.grilla[1][1] = bacteria2
 
-#Grilla de nutrientes
-print("nutrientes iniciales")
-print(ambiente.nutrientes)
-
-#Modificación de nutrientes
-print("actualización de nutrientes")
-ambiente.actualizar_nutrientes()
-
-# Simulación de un paso (solo para mostrar el funcionamiento de grilla y nutrientes)
-print("\n=== SIMULANDO UN PASO ===")
-
-ambiente.grilla[0, 0] = bacteria1
-print("\nBacteria colocada en (0,0):")
-print(ambiente.grilla)
-
-consumo = bacteria1.alimentar(ambiente.nutrientes[0, 0])
-ambiente.nutrientes[0, 0] -= consumo
-
-print("\nNutrientes después de alimentarse:")
-print(ambiente.nutrientes)
-
-print("\nActualizando nutrientes en todo el ambiente:")
-ambiente.actualizar_nutrientes()
+print("Estado inicial de la grilla:")
+grilla_puntos(ambiente.grilla)
