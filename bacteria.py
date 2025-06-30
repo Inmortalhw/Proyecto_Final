@@ -15,7 +15,7 @@ class Bacteria:
         return consumo
 
 # Método de reproducción de la bacteria
-    def dividirse(self):
+    def dividirse(self, probabilidad_mutacion=0.05): # Probabilidad de mutación del 5%
         if self.energia >= 70:
             energia_division = self.energia // 2 # Divide su energía a la mitad
             self.energia = energia_division
@@ -27,6 +27,10 @@ class Bacteria:
                 resistente=self.resistente,
                 estado="activa"
             )
+
+            hija.mutar(probabilidad_mutacion) # La hija puede mutar con la probabilidad dada
+
+            return hija
         else:
             print(f"{self.id} no tiene suficiente energía para dividirse.")
             return None
@@ -37,5 +41,9 @@ class Bacteria:
             return True
         return False
 
-    def mutar(self):
-        pass
+    def mutar(self, probabilidad=0.05): # Método de mutación con 5% de probabilidad
+        if random.random() < probabilidad:
+            self.resistente = True
+            print(f"{self.id} ha mutado y ahora es resistente.")
+            return True
+        return False
