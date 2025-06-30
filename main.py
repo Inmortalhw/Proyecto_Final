@@ -8,8 +8,12 @@ def grilla_puntos(grilla): # Grilla con puntos
             if isinstance(objeto, Bacteria):
                 if objeto.estado == "muerta":
                     print("X", end=" ") # Bacterias muertas con X
+                elif objeto.resistente:
+                    print("BR", end=" ") # Bacterias resistentes con BR
+                elif hasattr(objeto, 'consumo_reducido'): # Verifica si tiene mutación perjudicial
+                    print("BC", end=" ") # Bacterias con mutación perjudicial con BC
                 else:
-                    print("BR" if objeto.resistente else "B", end=" ")
+                    print("B", end=" ") # Bacterias normales con B
             else:
                 print(".", end=" ") # Espacios vacios con punto
         print()
@@ -43,7 +47,7 @@ grilla_puntos(ambiente.grilla)
 bacteria2.morir() # Bacteria2 muere por falta de energía
 
 # Bacteria1 se divide:
-hija = bacteria1.dividirse(probabilidad_mutacion=1)
+hija = bacteria1.dividirse(probabilidad_mutacion=1) # Probabilidad de mutación del 100% para prueba
 
 if hija:
     # Obtener posición de la madre

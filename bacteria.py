@@ -9,10 +9,12 @@ class Bacteria:
         self.estado = estado
 
 # Método para alimentar a la bacteria con nutrientes
-    def alimentar(self, nutrientes):
-        consumo = random.randint(15, 25) # Consumo aleatorio de nutrientes entre 15 y 25
+    def alimentar(self):
+        # Consumo de energía aleatorio entre 15 y 25 con mutación perjudicial de 3 a 5
+        consumo = random.randint(15, 25) if not hasattr(self, 'consumo_reducido') else random.randint(3, 5)
         self.energia += consumo
         return consumo
+
 
 # Método de reproducción de la bacteria
     def dividirse(self, probabilidad_mutacion=0.05 ): # Probabilidad de mutación del 5%
@@ -28,7 +30,8 @@ class Bacteria:
                 estado="activa"
             )
 
-            hija.mutar(probabilidad_mutacion) # La hija puede mutar con la probabilidad dada
+            if random.random() < probabilidad_mutacion:
+                hija.mutar() # La hija puede mutar con la probabilidad dada
 
             return hija
         else:
@@ -41,9 +44,16 @@ class Bacteria:
             return True
         return False
 
-    def mutar(self, probabilidad=0.05): # Método de mutación con 5% de probabilidad
-        if random.random() < probabilidad:
+    def mutar(self):
+        tipo = random.choice(["resistencia", "consumo_reducido", "mutacion_neutra"])
+
+        if tipo == "resistencia":
             self.resistente = True
             print(f"{self.id} ha mutado y ahora es resistente.")
-            return True
-        return False
+
+        elif tipo == "consumo_reducido":
+            self.consumo_reducido = True
+            print(f"{self.id} ha mutado y ahora consume menos energía al alimentarse.")
+
+        else:
+            print(f"{self.id} ha mutado de forma neutral, sin cambios significativos.")
