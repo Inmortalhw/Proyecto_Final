@@ -15,12 +15,12 @@ class Bacteria:
         return consumo
 
 # Método de reproducción de la bacteria
-    def dividirse(self, probabilidad_mutacion=0.05): # Probabilidad de mutación del 5%
+    def dividirse(self, probabilidad_mutacion=0.05 ): # Probabilidad de mutación del 5%
         if self.energia >= 70:
             energia_division = self.energia // 2 # Divide su energía a la mitad
             self.energia = energia_division
 
-            return Bacteria(
+            hija = Bacteria(
                 id=f"{self.id}-hija",
                 raza=self.raza,
                 energia=energia_division,

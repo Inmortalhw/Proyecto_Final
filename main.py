@@ -43,14 +43,14 @@ grilla_puntos(ambiente.grilla)
 bacteria2.morir() # Bacteria2 muere por falta de energía
 
 # Bacteria1 se divide:
-hija = bacteria1.dividirse(probabilidad_mutacion=100)
+hija = bacteria1.dividirse(probabilidad_mutacion=1)
 
 if hija:
     # Obtener posición de la madre
     madre_fila, madre_col = 0, 0  # Posición de bacteria1 en la grilla
     
     if colonia.ubicar_hija(madre_fila, madre_col, hija):
-        print("Bacteria se ha dividido y la hija ha sido ubicada en la grilla.")
+        print(f"Bacteria hija {hija.id} ha sido ubicada en la grilla, resistente: {hija.resistente}")
     else:
         print("No había espacio para dividirse.")
 
