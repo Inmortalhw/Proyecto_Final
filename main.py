@@ -18,47 +18,27 @@ def grilla_puntos(grilla): # Grilla con puntos
                 print(".", end=" ") # Espacios vacios con punto
         print()
 
-# Bacteria a dividir
-bacteria1 = Bacteria( 
-    id="bact-1",
-    raza="E. coli",
-    energia=80, # Energía suficiente para dividirse
-    resistente=False,
-    estado="activa"
-)
-
-bacteria2 = Bacteria(
-    id="bact-2",
-    raza="Salmonella",
-    energia=5, # Energía insuficiente para sobrevivir
-    resistente=True,
-    estado="activa"
-)
-
+# 1. Crear ambiente y poner nutrientes desiguales
 ambiente = Ambiente(filas=5, columnas=5)
-colonia = Colonia(ambiente)
+ambiente.nutrientes[0,0] = 60  # Muchos nutrientes aquí
+ambiente.nutrientes[0,1] = 20  # Pocos nutrientes aquí
+ambiente.nutrientes[4,0] = 10  # Muy pocos nutrientes aquí
+ambiente.nutrientes[4,4] = 0  # Sin nutrientes aquí
 
-ambiente.grilla[0, 0] = bacteria1
-ambiente.grilla[1, 2] = bacteria2
+# Mostrar antes
+print("ANTES:")
+print(ambiente.nutrientes)
 
-print("Estado inicial de la grilla:")
-grilla_puntos(ambiente.grilla)
+# Aplicar difusión
+ambiente.difundir_nutrientes()
 
-bacteria2.morir() # Bacteria2 muere por falta de energía
+# Mostrar después
+print("\nDESPUÉS:")
+print(ambiente.nutrientes)
 
-# Bacteria1 se divide:
-hija = bacteria1.dividirse(probabilidad_mutacion=1) # Probabilidad de mutación del 100% para prueba
+# Segunda difusión para ver equilibrio
+ambiente.difundir_nutrientes()
 
-if hija:
-    # Obtener posición de la madre
-    madre_fila, madre_col = 0, 0  # Posición de bacteria1 en la grilla
-    
-    if colonia.ubicar_hija(madre_fila, madre_col, hija):
-        print(f"Bacteria hija {hija.id} ha sido ubicada en la grilla, resistente: {hija.resistente}")
-    else:
-        print("No había espacio para dividirse.")
-
-print("Estado final de la grilla:")
-grilla_puntos(ambiente.grilla)
-
-print(f"\nenergia de bacteria1: {bacteria1.energia}, energia de nueva_bacteria: {hija.energia if hija else 'N/A'}")
+# Mostrar después de la segunda difusión
+print("\nGrilla de nutrientes después de la segunda difusión:")
+print(ambiente.nutrientes)

@@ -1,6 +1,6 @@
-import numpy as np #importación de numpy para comenzar grilla
+import numpy as np # Importación de numpy para manejar la grilla y nutrientes
 from bacteria import Bacteria #importación de la clase Bacteria
-import random #importación de random para aleatorizar direcciones
+import random
 
 class Ambiente:
     def __init__(self, filas, columnas):
@@ -15,7 +15,31 @@ class Ambiente:
         print (self.nutrientes)
 
     def difundir_nutrientes(self):
-        pass
+        # Copia los nutrientes actuales, así no modificamos el original durante la difusión
+        nuevos_nutrientes = self.nutrientes.copy()
+    
+        # Recorre todas las celdas
+        for fila in range(self.nutrientes.shape[0]):
+            for col in range(self.nutrientes.shape[1]):
+
+                    # Coordenadas de las celdas vecinas
+                    vecinos = [] # Lista para almacenar los nutrientes de las celdas vecinas
+                    for df, dc in [(-1,0), (1,0), (0,-1), (0,1)]:  # Arriba, abajo, izquierda, derecha
+                        nf = fila + df # Movimiento en fila (nueva fila)
+                        nc = col + dc  # Movimiento en columna (nueva columna)
+                        # Verifica que nf y nc están dentro de los límites de la grilla
+                        if 0 <= nf < self.nutrientes.shape[0] and 0 <= nc < self.nutrientes.shape[1]:
+                            vecinos.append(self.nutrientes[nf, nc]) # Añade el valor de nutrientes de la celda vecina a la lista
+                
+                    if vecinos:  # Si tiene vecinos
+                    # Suma los nutrientes de las celdas vecinas y las divide por la cantidad de vecinos
+                        promedio = sum(vecinos) / len(vecinos)
+                        # Actualiza el valor de nutrientes de la celda actual sumando el promedio
+                        # con un factor de 0.5 para suavizar la difusión
+                        nuevos_nutrientes[fila, col] = 0.5 * self.nutrientes[fila, col] + 0.5 * promedio  # Actualizar
+    
+        # Paso 5: Aplicar cambios
+        self.nutrientes = nuevos_nutrientes
 
     def aplicar_ambiente(self):
         pass

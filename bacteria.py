@@ -30,8 +30,8 @@ class Bacteria:
                 estado="activa"
             )
 
-            if random.random() < probabilidad_mutacion:
-                hija.mutar() # La hija puede mutar con la probabilidad dada
+            if random.random() < probabilidad_mutacion: # La hija puede mutar con la probabilidad dada
+                hija.mutar() 
 
             return hija
         else:
