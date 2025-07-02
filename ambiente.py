@@ -11,6 +11,7 @@ class Ambiente:
     def actualizar_nutrientes(self):
         self.nutrientes -= 5 # Testeo simple de modificación de nutrientes
         print (self.nutrientes)
+        self.nutrientes[self.nutrientes < 0] = 0  # Evita que los nutrientes sean negativos
 
     def difundir_nutrientes(self):
         # Copia los nutrientes actuales, así no modificamos el original durante la difusión
@@ -73,24 +74,35 @@ class Colonia:
         return False  # No se pudo ubicar
 
     def paso(self):
+        # Primero: Difundir nutrientes
+        self.ambiente.difundir_nutrientes()
+    
         for fila in range(self.ambiente.grilla.shape[0]):
             for col in range(self.ambiente.grilla.shape[1]):
                 bacteria = self.ambiente.grilla[fila, col]
             
                 if isinstance(bacteria, Bacteria):
-                    # Consumo de energía
-                    bacteria.consumir_energia()  # Todas las bacterias pierden energía
+                    # 1. Alimentarse de nutrientes disponibles
+                    nutrientes_celda = self.ambiente.nutrientes[fila, col]
+                    consumo = bacteria.alimentar(nutrientes_celda)
+                    self.ambiente.nutrientes[fila, col] -= consumo
                 
-                    # División con herencia
+                    # 2. Consumo de energía metabólica
+                    bacteria.consumir_energia()
+                
+                    # 3. Reproducción
                     if bacteria.energia >= 60:
                         hija = bacteria.dividirse()
-                        if hija:  # Si se creó una hija
+                        if hija:
                             self.ubicar_hija(fila, col, hija)
                 
-                    # Muerte antibiótico o inanición
-                    en_zona = self.ambiente.zona_antibiotica[fila, col]
-                    if bacteria.morir(en_zona):
-                        self.ambiente.grilla[fila, col] = None  # Eliminar bacteria muerta
+                    # 4. Muerte
+                    en_zona_antibiotica = self.ambiente.zona_antibiotica[fila, col]
+                    if bacteria.morir(en_zona_antibiotica):
+                        self.ambiente.grilla[fila, col] = None
+    
+        # Actualizar nutrientes después de todo el paso
+        self.ambiente.actualizar_nutrientes()
 
     def reporte_estado():
         pass

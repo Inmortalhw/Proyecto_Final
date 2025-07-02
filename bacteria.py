@@ -9,9 +9,16 @@ class Bacteria:
         self.estado = estado
 
 # Método para alimentar a la bacteria con nutrientes
-    def alimentar(self):
-        # Consumo de energía aleatorio entre 15 y 25 con mutación perjudicial de 3 a 5
-        consumo = random.randint(15, 25) if not hasattr(self, 'consumo_reducido') else random.randint(3, 5)
+    def alimentar(self, nutrientes_disponibles):   
+        if nutrientes_disponibles <= 0:
+            return 0
+    
+        # Bacterias normales consumen más que las mutadas
+        if hasattr(self, 'consumo_reducido'):
+            consumo = min(random.randint(3, 5), nutrientes_disponibles)
+        else:
+            consumo = min(random.randint(15, 25), nutrientes_disponibles)
+    
         self.energia += consumo
         return consumo
 
