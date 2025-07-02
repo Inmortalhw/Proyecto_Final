@@ -97,27 +97,61 @@ def simulacion_completa(filas=10, columnas=10, num_bacterias=10, pasos=5):
     
     print("=== Estado Inicial ===")
     plot_grilla_completa(ambiente)
+
+    metricas = {
+        'total_bacterias': [],
+        'consumo_reducido': [],
+        'resistentes': [],
+        'nutrientes_promedio': [],
+        'mutaciones': 0
+    }
     
     for paso in range(pasos):
         # Ejecutar todos los procesos
         colonia.paso()
         ambiente.difundir_nutrientes()
         
+        bacterias = [b for b in ambiente.grilla.flatten() if isinstance(b, Bacteria)]
+        metricas['total_bacterias'].append(len(bacterias))
+        metricas['consumo_reducido'].append(sum(b.consumo_reducido for b in bacterias))
+        metricas['resistentes'].append(sum(b.resistente for b in bacterias))
+        metricas['nutrientes_promedio'].append(np.mean(ambiente.nutrientes))
+        
+        print(f"\n=== Paso {paso+1} ===")
+        print(f"Total: {len(bacterias)} | Consumo reducido: {metricas['consumo_reducido'][-1]}")
+        print(f"Resistentes: {metricas['resistentes'][-1]} | Nutrientes: {metricas['nutrientes_promedio'][-1]:.1f}")
+        
+        plot_grilla_completa(ambiente)
+
         print(f"\n=== Paso {paso+1} ===")
         print(f"Bacterias totales: {sum(1 for x in ambiente.grilla.flatten() if isinstance(x, Bacteria))}")
-        print(f"Bacterias con consumo reducido: {sum(1 for x in ambiente.grilla.flatten() if isinstance(x, Bacteria) and hasattr(x, 'consumo_reducido'))}")
+        print(f"Bacterias con consumo reducido: {sum(1 for x in ambiente.grilla.flatten() if isinstance(x, Bacteria) and x.consumo_reducido)}")
         print(f"Bacterias resistentes: {sum(1 for x in ambiente.grilla.flatten() if isinstance(x, Bacteria) and x.resistente)}")
         print(f"Nutrientes promedio: {np.mean(ambiente.nutrientes):.1f}")
         
         plot_grilla_completa(ambiente)
     
     print("\n=== Simulación completada ===")
+    print("\n=== Resumen Final ===")
+    print(f"Mutaciones ocurridas: {metricas['mutaciones']}")
+    print(f"Máximo consumo reducido: {max(metricas['consumo_reducido'])}")
+    
+    # Gráfico de evolución
+    plt.figure(figsize=(10, 5))
+    plt.plot(metricas['total_bacterias'], label='Total bacterias')
+    plt.plot(metricas['consumo_reducido'], label='Consumo reducido')
+    plt.plot(metricas['resistentes'], label='Resistentes')
+    plt.xlabel('Pasos')
+    plt.ylabel('Cantidad')
+    plt.legend()
+    plt.title('Evolución de la Población Bacteriana')
+    plt.show()
 
 if __name__ == "__main__":
     # Parámetros personalizables
     TAMAÑO_GRILLA = (10, 10)
     BACTERIAS_INICIALES = 20
-    PASOS_SIMULACION = 10
+    PASOS_SIMULACION = 20
     
     # Ejecutar simulación
     simulacion_completa(

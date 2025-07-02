@@ -30,7 +30,7 @@ class Bacteria:
             print(f"{self.id} se ha quedado sin energía.")
 
 # Método de reproducción de la bacteria
-    def dividirse(self, probabilidad_mutacion=0.05 ): # Probabilidad de mutación del 5%
+    def dividirse(self, probabilidad_mutacion=0.10 ): # Probabilidad de mutación al 10%
         if self.energia >= 60:
             energia_division = self.energia // 2 # Divide su energía a la mitad
             self.energia = energia_division
