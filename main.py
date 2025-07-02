@@ -3,6 +3,7 @@ import matplotlib.colors as mcolors
 import numpy as np
 from bacteria import Bacteria
 from ambiente import Ambiente, Colonia
+import random
 
 # Configuración inicial
 def crear_ambiente_con_bacterias(filas=5, columnas=5, num_bacterias=3):
@@ -29,38 +30,50 @@ def crear_ambiente_con_bacterias(filas=5, columnas=5, num_bacterias=3):
     return ambiente
 
 
-def plot_grilla(grilla, zona_antibiotica):
-    # Crear un mapa de colores personalizado
-    cmap = mcolors.ListedColormap(['white', 'green', 'red', 'yellow', 'gray', 'blue'])
-    bounds = [0, 1, 2, 3, 4, 5, 6]
-    norm = mcolors.BoundaryNorm(bounds, cmap.N)
+def plot_grilla_completa(ambiente):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
     
-    # Crear matriz numérica para matplotlib
-    plot_matrix = np.zeros(grilla.shape)
-    
-    for fila in range(grilla.shape[0]):
-        for col in range(grilla.shape[1]):
-            objeto = grilla[fila, col]
-            
+    # Grilla de bacterias y antibióticos
+    plot_matrix = np.zeros(ambiente.grilla.shape)
+    for fila in range(ambiente.grilla.shape[0]):
+        for col in range(ambiente.grilla.shape[1]):
+            objeto = ambiente.grilla[fila, col]
             if objeto is not None and isinstance(objeto, Bacteria):
                 if objeto.estado == "muerta":
-                    plot_matrix[fila, col] = 4  # Gris para muertas
+                    plot_matrix[fila, col] = 4  # Gris
                 elif objeto.resistente:
-                    plot_matrix[fila, col] = 2  # Rojo para resistentes
+                    plot_matrix[fila, col] = 2  # Rojo
                 elif hasattr(objeto, 'consumo_reducido'):
-                    plot_matrix[fila, col] = 3  # Amarillo para consumo reducido
+                    plot_matrix[fila, col] = 3  # Amarillo
                 else:
-                    plot_matrix[fila, col] = 1  # Verde para normales
-            elif zona_antibiotica[fila, col]:
-                plot_matrix[fila, col] = 5  # Azul para antibióticos
+                    plot_matrix[fila, col] = 1  # Verde
+            elif ambiente.zona_antibiotica[fila, col]:
+                plot_matrix[fila, col] = 5  # Azul
             else:
-                plot_matrix[fila, col] = 0  # Blanco para vacío
+                plot_matrix[fila, col] = 0  # Blanco
     
-    # Configurar el gráfico
-    fig, ax = plt.subplots(figsize=(8, 6))
-    img = ax.imshow(plot_matrix, cmap=cmap, norm=norm)
+    # Mapa de colores para bacterias
+    cmap_bacterias = mcolors.ListedColormap(['white', 'green', 'red', 'yellow', 'gray', 'blue'])
+    norm_bacterias = mcolors.BoundaryNorm([0, 1, 2, 3, 4, 5, 6], cmap_bacterias.N)
     
-    # Crear leyenda
+    img1 = ax1.imshow(plot_matrix, cmap=cmap_bacterias, norm=norm_bacterias)
+    ax1.set_title("Bacterias y Antibióticos")
+    
+    # Grilla de nutrientes
+    nutrientes_norm = ambiente.nutrientes / np.max(ambiente.nutrientes)  # Normalizar
+    cmap_nutrientes = plt.cm.Greens
+    img2 = ax2.imshow(ambiente.nutrientes, cmap=cmap_nutrientes)
+    plt.colorbar(img2, ax=ax2, label='Nivel de nutrientes')
+    ax2.set_title("Distribución de Nutrientes")
+    
+    # Configuración común
+    for ax in [ax1, ax2]:
+        ax.set_xticks(np.arange(-.5, ambiente.grilla.shape[1], 1), minor=True)
+        ax.set_yticks(np.arange(-.5, ambiente.grilla.shape[0], 1), minor=True)
+        ax.grid(which="minor", color="black", linestyle='-', linewidth=0.5)
+        ax.tick_params(which="minor", size=0)
+    
+    # Leyendas para bacterias
     legend_labels = {
         'Vacío': 'white',
         'Bacteria normal': 'green',
@@ -72,90 +85,43 @@ def plot_grilla(grilla, zona_antibiotica):
     patches = [plt.plot([], [], marker="s", ms=10, ls="", 
                         color=color, label=label)[0] 
                for label, color in legend_labels.items()]
-    ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc='upper left')
+    ax1.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc='upper left')
     
-    # Añadir líneas de la grilla
-    ax.set_xticks(np.arange(-.5, grilla.shape[1], 1), minor=True)
-    ax.set_yticks(np.arange(-.5, grilla.shape[0], 1), minor=True)
-    ax.grid(which="minor", color="black", linestyle='-', linewidth=0.5)
-    ax.tick_params(which="minor", size=0)
-    
-    # Mostrar valores en las celdas
-    for i in range(grilla.shape[0]):
-        for j in range(grilla.shape[1]):
-            if plot_matrix[i, j] > 0:
-                ax.text(j, i, int(plot_matrix[i, j]), 
-                        ha="center", va="center", color="black")
-    
-    plt.title("Simulación de Colonias Bacterianas")
     plt.tight_layout()
     plt.show()
 
-def simulacion_interactiva(ambiente, pasos=5, delay=1.0):
+def simulacion_completa(filas=10, columnas=10, num_bacterias=10, pasos=5):
+    # Configuración inicial
+    ambiente = crear_ambiente_con_bacterias(filas, columnas, num_bacterias)
     colonia = Colonia(ambiente)
-    fig, ax = plt.subplots(figsize=(8, 6))
-    plt.ion()  # Modo interactivo
     
-    cmap = mcolors.ListedColormap(['white', 'green', 'red', 'yellow', 'gray', 'blue'])
-    norm = mcolors.BoundaryNorm([0, 1, 2, 3, 4, 5, 6], cmap.N)
+    print("=== Estado Inicial ===")
+    plot_grilla_completa(ambiente)
     
     for paso in range(pasos):
+        # Ejecutar todos los procesos
         colonia.paso()
+        ambiente.difundir_nutrientes()
         
-        # Actualizar matriz de visualización
-        plot_matrix = np.zeros(ambiente.grilla.shape)
-        for fila in range(ambiente.grilla.shape[0]):
-            for col in range(ambiente.grilla.shape[1]):
-                objeto = ambiente.grilla[fila, col]
-                if objeto is not None and isinstance(objeto, Bacteria):
-                    if objeto.estado == "muerta":
-                        plot_matrix[fila, col] = 4
-                    elif objeto.resistente:
-                        plot_matrix[fila, col] = 2
-                    elif hasattr(objeto, 'consumo_reducido'):
-                        plot_matrix[fila, col] = 3
-                    else:
-                        plot_matrix[fila, col] = 1
-                elif ambiente.zona_antibiotica[fila, col]:
-                    plot_matrix[fila, col] = 5
-                else:
-                    plot_matrix[fila, col] = 0
+        print(f"\n=== Paso {paso+1} ===")
+        print(f"Bacterias totales: {sum(1 for x in ambiente.grilla.flatten() if isinstance(x, Bacteria))}")
+        print(f"Bacterias resistentes: {sum(1 for x in ambiente.grilla.flatten() if isinstance(x, Bacteria) and x.resistente)}")
+        print(f"Nutrientes promedio: {np.mean(ambiente.nutrientes):.1f}")
         
-        ax.clear()
-        ax.imshow(plot_matrix, cmap=cmap, norm=norm)
-        
-        # Añadir líneas de la grilla
-        ax.set_xticks(np.arange(-.5, ambiente.grilla.shape[1], 1), minor=True)
-        ax.set_yticks(np.arange(-.5, ambiente.grilla.shape[0], 1), minor=True)
-        ax.grid(which="minor", color="black", linestyle='-', linewidth=0.5)
-        ax.tick_params(which="minor", size=0)
-        
-        ax.set_title(f"Paso {paso+1}")
-        plt.draw()
-        plt.pause(delay)
+        plot_grilla_completa(ambiente)
     
-    plt.ioff()
-    plt.show()
+    print("\n=== Simulación completada ===")
 
-# Crear ambiente y configurar simulación
-ambiente = Ambiente(filas=10, columnas=10)
-bacteria = Bacteria(id="B1", raza="cilobac", energia=65, resistente=True)
-ambiente.grilla[0,0] = bacteria
-ambiente.agregar_zona_antibiotica(fila=2, col=2, radio=1)
-
-# Visualización paso a paso
-print("Estado inicial:")
-plot_grilla(ambiente.grilla, ambiente.zona_antibiotica)
-
-colonia = Colonia(ambiente)
-colonia.paso()
-print("\nDespués del primer paso:")
-plot_grilla(ambiente.grilla, ambiente.zona_antibiotica)
-
-colonia.paso()
-print("\nDespués del segundo paso:")
-plot_grilla(ambiente.grilla, ambiente.zona_antibiotica)
-
-# Simulación interactiva reversa
-print("\nSimulación interactiva:")
-simulacion_interactiva(ambiente, pasos=3, delay=1.0)
+if __name__ == "__main__":
+    # Parámetros personalizables
+    TAMAÑO_GRILLA = (10, 10)
+    BACTERIAS_INICIALES = 20
+    PASOS_SIMULACION = 10
+    
+    # Ejecutar simulación
+    simulacion_completa(
+        filas=TAMAÑO_GRILLA[0],
+        columnas=TAMAÑO_GRILLA[1],
+        num_bacterias=BACTERIAS_INICIALES,
+        pasos=PASOS_SIMULACION
+    )
