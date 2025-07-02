@@ -15,6 +15,11 @@ class Bacteria:
         self.energia += consumo
         return consumo
 
+    def consumir_energia(self, gasto=5):
+        self.energia -= gasto
+        if self.energia < 0:
+            self.energia = 0
+            print(f"{self.id} se ha quedado sin energía.")
 
 # Método de reproducción de la bacteria
     def dividirse(self, probabilidad_mutacion=0.05 ): # Probabilidad de mutación del 5%
@@ -26,12 +31,15 @@ class Bacteria:
                 id=f"{self.id}-hija",
                 raza=self.raza,
                 energia=energia_division,
-                resistente=self.resistente,
+                resistente=self.resistente if random.random() < 0.95 else False, # La hija puede heredar la resistencia
                 estado="activa"
             )
-            #""
-            if random.random() < probabilidad_mutacion: # La hija puede mutar con la probabilidad dada
-                hija.mutar() 
+            
+            if hasattr(self, "consumo_reducido") and random.random() < 0.95:
+                hija.consumo_reducido = True # La hija puede heredar el consumo reducido
+
+            if random.random() < probabilidad_mutacion:
+                hija.mutar() # Hija mutacion nueva
 
             return hija
         else:
