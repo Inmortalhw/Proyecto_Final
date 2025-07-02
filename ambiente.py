@@ -6,9 +6,7 @@ class Ambiente:
     def __init__(self, filas, columnas):
         self.grilla = np.full((filas, columnas), None, dtype=object) #Grilla de tipo objetos sin nada
         self.nutrientes = np.full((filas, columnas), 40) #Grilla de nutrientes con valor 40
-        self.factores = {
-            "antibióticos": None
-        }
+        self.zona_antibiotica = np.zeros((filas, columnas), dtype=bool) # Grilla de tipo booleana de antibioticos
 
     def actualizar_nutrientes(self):
         self.nutrientes -= 5 # Testeo simple de modificación de nutrientes
@@ -38,11 +36,16 @@ class Ambiente:
                         # con un factor de 0.5 para suavizar la difusión
                         nuevos_nutrientes[fila, col] = 0.5 * self.nutrientes[fila, col] + 0.5 * promedio  # Actualizar
     
-        # Paso 5: Aplicar cambios
+        # Aplicar cambios
         self.nutrientes = nuevos_nutrientes
 
-    def aplicar_ambiente(self):
-        pass
+    def agregar_zona_antibiotica(self, fila, col, radio=1):
+        for i in range(max(0, fila - radio), min(fila + radio + 1, self.zona_antibiotica.shape[0])):
+            for j in range(max(0, col - radio), min(col + radio + 1, self.zona_antibiotica.shape[1])):
+                self.zona_antibiotica[i, j] = True
+    
+    def eliminar_zona_antibiotica(self, fila, columna):
+        self.zona_antibiotica.fill(False)  # Elimina todas las zonas antibióticas
 
 class Colonia:
     def __init__(self, ambiente):
@@ -68,8 +71,14 @@ class Colonia:
                     return True  # Ubicada con éxito
         return False  # No se pudo ubicar
 
-    def paso():
-        pass
+    def paso(self):
+    # Aplicar efecto de antibióticos
+        for fila in range(self.ambiente.grilla.shape[0]):
+            for col in range(self.ambiente.grilla.shape[1]):
+                bacteria = self.ambiente.grilla[fila, col]
+                if isinstance(bacteria, Bacteria):
+                    en_zona = self.ambiente.zona_antibiotica[fila, col]
+                    bacteria.morir(en_zona)
 
     def reporte_estado():
         pass

@@ -18,7 +18,7 @@ class Bacteria:
 
 # Método de reproducción de la bacteria
     def dividirse(self, probabilidad_mutacion=0.05 ): # Probabilidad de mutación del 5%
-        if self.energia >= 70:
+        if self.energia >= 60:
             energia_division = self.energia // 2 # Divide su energía a la mitad
             self.energia = energia_division
 
@@ -29,7 +29,7 @@ class Bacteria:
                 resistente=self.resistente,
                 estado="activa"
             )
-
+            #""
             if random.random() < probabilidad_mutacion: # La hija puede mutar con la probabilidad dada
                 hija.mutar() 
 
@@ -38,10 +38,19 @@ class Bacteria:
             print(f"{self.id} no tiene suficiente energía para dividirse.")
             return None
 
-    def morir(self):
+    def morir(self, en_zona_antibiotica=False):
         if self.energia < 10: # Si la energía es menor a 10, la bacteria muere
             self.estado = "muerta"
             return True
+
+        if en_zona_antibiotica and not self.resistente:
+            probabilidad_supervivencia = 0.15
+            if random.random() > probabilidad_supervivencia: 
+                self.estado = "muerta"
+                print(f"{self.id} ha muerto por el antibiótico.")
+                return True
+            else:
+                print(f"{self.id} ha sobrevivido al antibiótico.")
         return False
 
     def mutar(self):

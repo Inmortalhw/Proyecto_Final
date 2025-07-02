@@ -2,43 +2,44 @@ from bacteria import Bacteria
 from ambiente import Ambiente, Colonia
 import numpy as np
 
-def grilla_puntos(grilla): # Grilla con puntos
-    for fila in grilla:
-        for objeto in fila:
-            if isinstance(objeto, Bacteria):
+def grilla_puntos(grilla, zona_antibiotica): # Grilla con puntos
+    for fila in range(grilla.shape[0]):
+        for col in range(grilla.shape[1]):
+            objeto = grilla[fila, col]
+            if objeto is not None and isinstance(objeto, Bacteria): # Verifica si hay una bacteria
                 if objeto.estado == "muerta":
-                    print("X", end=" ") # Bacterias muertas con X
+                    print("X", end=" ")
                 elif objeto.resistente:
-                    print("BR", end=" ") # Bacterias resistentes con BR
-                elif hasattr(objeto, 'consumo_reducido'): # Verifica si tiene mutación perjudicial
-                    print("BC", end=" ") # Bacterias con mutación perjudicial con BC
+                    print("BR", end=" ")
+                elif hasattr(Bacteria, 'consumo_reducido'):
+                    print("BC", end=" ")
                 else:
-                    print("B", end=" ") # Bacterias normales con B
+                    print("B", end=" ")
+            elif zona_antibiotica[fila, col]:
+                print("A", end=" ") # Antibióticos con A
             else:
                 print(".", end=" ") # Espacios vacios con punto
         print()
 
-# 1. Crear ambiente y poner nutrientes desiguales
+# Crear ambiente
 ambiente = Ambiente(filas=5, columnas=5)
-ambiente.nutrientes[0,0] = 60  # Muchos nutrientes aquí
-ambiente.nutrientes[0,1] = 20  # Pocos nutrientes aquí
-ambiente.nutrientes[4,0] = 10  # Muy pocos nutrientes aquí
-ambiente.nutrientes[4,4] = 0  # Sin nutrientes aquí
 
-# Mostrar antes
-print("ANTES:")
-print(ambiente.nutrientes)
+# Agregar bacterias
+bacteria_normal = Bacteria(id="B1", raza="Salmonela", resistente=False, estado="activa")
+bacteria_resistente = Bacteria(id="B2", raza="Cilobacter", resistente=True, estado="activa")
+ambiente.grilla[2, 2] = bacteria_normal
+ambiente.grilla[2, 3] = bacteria_resistente
 
-# Aplicar difusión
-ambiente.difundir_nutrientes()
+# Crear zona antibiótica (centro de 3x3)
+ambiente.agregar_zona_antibiotica(2, 2, radio=1)
 
-# Mostrar después
-print("\nDESPUÉS:")
-print(ambiente.nutrientes)
+# Mostrar grilla
+print("Antes del paso:")
+grilla_puntos(ambiente.grilla, ambiente.zona_antibiotica)
 
-# Segunda difusión para ver equilibrio
-ambiente.difundir_nutrientes()
+# Ejecutar paso de simulación
+colonia = Colonia(ambiente)
+colonia.paso()
 
-# Mostrar después de la segunda difusión
-print("\nGrilla de nutrientes después de la segunda difusión:")
-print(ambiente.nutrientes)
+print("\nDespués del paso:")
+grilla_puntos(ambiente.grilla, ambiente.zona_antibiotica)
