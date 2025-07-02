@@ -105,7 +105,7 @@ def simulacion_completa(filas=10, columnas=10, num_bacterias=10, pasos=5):
         'nutrientes_promedio': [],
         'mutaciones': 0
     }
-    
+
     for paso in range(pasos):
         # Ejecutar todos los procesos
         colonia.paso()
@@ -152,7 +152,8 @@ if __name__ == "__main__":
     TAMAÑO_GRILLA = (10, 10)
     BACTERIAS_INICIALES = 20
     PASOS_SIMULACION = 20
-    
+    probabilidad_mutacion = 0.10
+
     # Ejecutar simulación
     simulacion_completa(
         filas=TAMAÑO_GRILLA[0],
