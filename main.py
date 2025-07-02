@@ -4,6 +4,31 @@ import numpy as np
 from bacteria import Bacteria
 from ambiente import Ambiente, Colonia
 
+# Configuración inicial
+def crear_ambiente_con_bacterias(filas=5, columnas=5, num_bacterias=3):
+    ambiente = Ambiente(filas, columnas)
+    
+    # Agregar bacterias aleatorias
+    for i in range(num_bacterias):
+        fila, col = random.randint(0, filas-1), random.randint(0, columnas-1)
+        while ambiente.grilla[fila, col] is not None:  # Buscar posición vacía
+            fila, col = random.randint(0, filas-1), random.randint(0, columnas-1)
+        
+        resistencia = random.random() < 0.2  # 20% de probabilidad de ser resistente
+        ambiente.grilla[fila, col] = Bacteria(
+            id=f"B{i}",
+            raza="cilobac",
+            energia=random.randint(40, 60),
+            resistente=resistencia
+        )
+    
+    # Agregar zona antibiótica central
+    centro_fila, centro_col = filas//2, columnas//2
+    ambiente.agregar_zona_antibiotica(fila=centro_fila, col=centro_col, radio=1)
+    
+    return ambiente
+
+
 def plot_grilla(grilla, zona_antibiotica):
     # Crear un mapa de colores personalizado
     cmap = mcolors.ListedColormap(['white', 'green', 'red', 'yellow', 'gray', 'blue'])
