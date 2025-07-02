@@ -11,7 +11,7 @@ def grilla_puntos(grilla, zona_antibiotica): # Grilla con puntos
                     print("X", end=" ")
                 elif objeto.resistente:
                     print("BR", end=" ")
-                elif hasattr(Bacteria, 'consumo_reducido'):
+                elif hasattr(objeto, 'consumo_reducido'):
                     print("BC", end=" ")
                 else:
                     print("B", end=" ")
@@ -21,25 +21,24 @@ def grilla_puntos(grilla, zona_antibiotica): # Grilla con puntos
                 print(".", end=" ") # Espacios vacios con punto
         print()
 
-# Crear ambiente
-ambiente = Ambiente(filas=5, columnas=5)
+ambiente = Ambiente(filas=5, columnas=5) # Crear ambiente de 5x5
 
-# Agregar bacterias
-bacteria_normal = Bacteria(id="B1", raza="Salmonela", resistente=False, estado="activa")
-bacteria_resistente = Bacteria(id="B2", raza="Cilobacter", resistente=True, estado="activa")
-ambiente.grilla[2, 2] = bacteria_normal
-ambiente.grilla[2, 3] = bacteria_resistente
+bacteria = Bacteria(id="B1", raza="cilobac", energia=65, resistente=True)
+ambiente.grilla[0,0] = bacteria
 
-# Crear zona antibiótica (centro de 3x3)
-ambiente.agregar_zona_antibiotica(2, 2, radio=1)
+ambiente.agregar_zona_antibiotica(fila=2, col=2, radio=1) # Agregar zona antibiótica en (2,2)
 
-# Mostrar grilla
-print("Antes del paso:")
 grilla_puntos(ambiente.grilla, ambiente.zona_antibiotica)
+print("energía de la bacteria:", bacteria.energia)
 
-# Ejecutar paso de simulación
 colonia = Colonia(ambiente)
 colonia.paso()
+print("Después del primer paso:")
 
-print("\nDespués del paso:")
 grilla_puntos(ambiente.grilla, ambiente.zona_antibiotica)
+print("energía de la bacteria después del paso:", bacteria.energia)
+
+colonia.paso() # Realizar otro paso
+grilla_puntos(ambiente.grilla, ambiente.zona_antibiotica)
+
+print("energía de la bacteria después del paso:", bacteria.energia)

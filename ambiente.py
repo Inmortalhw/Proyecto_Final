@@ -39,6 +39,7 @@ class Ambiente:
         # Aplicar cambios
         self.nutrientes = nuevos_nutrientes
 
+    # Agrega una zona antibiótica en la grilla
     def agregar_zona_antibiotica(self, fila, col, radio=1):
         for i in range(max(0, fila - radio), min(fila + radio + 1, self.zona_antibiotica.shape[0])):
             for j in range(max(0, col - radio), min(col + radio + 1, self.zona_antibiotica.shape[1])):
@@ -72,13 +73,24 @@ class Colonia:
         return False  # No se pudo ubicar
 
     def paso(self):
-    # Aplicar efecto de antibióticos
         for fila in range(self.ambiente.grilla.shape[0]):
             for col in range(self.ambiente.grilla.shape[1]):
                 bacteria = self.ambiente.grilla[fila, col]
+            
                 if isinstance(bacteria, Bacteria):
+                    # Consumo de energía
+                    bacteria.consumir_energia()  # Todas las bacterias pierden energía
+                
+                    # División con herencia
+                    if bacteria.energia >= 60:
+                        hija = bacteria.dividirse()
+                        if hija:  # Si se creó una hija
+                            self.ubicar_hija(fila, col, hija)
+                
+                    # Muerte antibiótico o inanición
                     en_zona = self.ambiente.zona_antibiotica[fila, col]
-                    bacteria.morir(en_zona)
+                    if bacteria.morir(en_zona):
+                        self.ambiente.grilla[fila, col] = None  # Eliminar bacteria muerta
 
     def reporte_estado():
         pass
