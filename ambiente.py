@@ -5,7 +5,7 @@ import random
 class Ambiente:
     def __init__(self, filas, columnas):
         self.grilla = np.full((filas, columnas), None, dtype=object) #Grilla de tipo objetos sin nada
-        self.nutrientes = np.full((filas, columnas), 40) #Grilla de nutrientes con valor 40
+        self.nutrientes = np.full((filas, columnas), 50) #Grilla de nutrientes con valor 40
         self.zona_antibiotica = np.zeros((filas, columnas), dtype=bool) # Grilla de tipo booleana de antibioticos
 
     def actualizar_nutrientes(self):

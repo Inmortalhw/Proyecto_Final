@@ -1,12 +1,13 @@
 import random
 
 class Bacteria:
-    def __init__(self, id, raza, energia=50, resistente=False, estado="activa"):
+    def __init__(self, id, raza, energia=50, resistente=False, estado="activa", consumo_reducido=False):
         self.id = id
         self.raza = raza
         self.energia = energia
         self.resistente = resistente
         self.estado = estado
+        self.consumo_reducido = consumo_reducido 
 
 # Método para alimentar a la bacteria con nutrientes
     def alimentar(self, nutrientes_disponibles):   
@@ -14,7 +15,7 @@ class Bacteria:
             return 0
     
         # Bacterias normales consumen más que las mutadas
-        if hasattr(self, 'consumo_reducido'):
+        if self.consumo_reducido:
             consumo = min(random.randint(3, 5), nutrientes_disponibles)
         else:
             consumo = min(random.randint(15, 25), nutrientes_disponibles)
@@ -39,12 +40,10 @@ class Bacteria:
                 raza=self.raza,
                 energia=energia_division,
                 resistente=self.resistente if random.random() < 0.95 else False, # La hija puede heredar la resistencia
+                consumo_reducido=self.consumo_reducido if random.random() < 0.95 else False, # La hija puede heredar el consumo reducido
                 estado="activa"
             )
             
-            if hasattr(self, "consumo_reducido") and random.random() < 0.95:
-                hija.consumo_reducido = True # La hija puede heredar el consumo reducido
-
             if random.random() < probabilidad_mutacion:
                 hija.mutar() # Hija mutacion nueva
 

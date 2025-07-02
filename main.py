@@ -15,7 +15,7 @@ def crear_ambiente_con_bacterias(filas=5, columnas=5, num_bacterias=3):
         while ambiente.grilla[fila, col] is not None:  # Buscar posición vacía
             fila, col = random.randint(0, filas-1), random.randint(0, columnas-1)
         
-        resistencia = random.random() < 0.2  # 20% de probabilidad de ser resistente
+        resistencia = random.random() < 0.02  # 2% de probabilidad de ser resistente
         ambiente.grilla[fila, col] = Bacteria(
             id=f"B{i}",
             raza="cilobac",
@@ -41,12 +41,12 @@ def plot_grilla_completa(ambiente):
             if objeto is not None and isinstance(objeto, Bacteria):
                 if objeto.estado == "muerta":
                     plot_matrix[fila, col] = 4  # Gris
+                elif objeto.consumo_reducido:  # Prioridad a consumo reducido
+                    plot_matrix[fila, col] = 3  # Amarillo
                 elif objeto.resistente:
                     plot_matrix[fila, col] = 2  # Rojo
-                elif hasattr(objeto, 'consumo_reducido'):
-                    plot_matrix[fila, col] = 3  # Amarillo
                 else:
-                    plot_matrix[fila, col] = 1  # Verde
+                    plot_matrix[fila, col] = 1   # Verde
             elif ambiente.zona_antibiotica[fila, col]:
                 plot_matrix[fila, col] = 5  # Azul
             else:
@@ -105,6 +105,7 @@ def simulacion_completa(filas=10, columnas=10, num_bacterias=10, pasos=5):
         
         print(f"\n=== Paso {paso+1} ===")
         print(f"Bacterias totales: {sum(1 for x in ambiente.grilla.flatten() if isinstance(x, Bacteria))}")
+        print(f"Bacterias con consumo reducido: {sum(1 for x in ambiente.grilla.flatten() if isinstance(x, Bacteria) and hasattr(x, 'consumo_reducido'))}")
         print(f"Bacterias resistentes: {sum(1 for x in ambiente.grilla.flatten() if isinstance(x, Bacteria) and x.resistente)}")
         print(f"Nutrientes promedio: {np.mean(ambiente.nutrientes):.1f}")
         
