@@ -5,8 +5,9 @@ from ambiente import Ambiente
 from bacteria import Bacteria
 
 class Simulador:
-    def __init__(self, ambiente):
+    def __init__(self, ambiente, archivo_salida="simulación_log.txt"):
         self.ambiente = ambiente
+        self.archivo_salida = archivo_salida
         self.metricas = {
             'total_bacterias': [],
             'consumo_reducido': [],
@@ -14,6 +15,9 @@ class Simulador:
             'nutrientes_promedio': [],
             'mutaciones': 0
         }
+
+        with open(self.archivo_salida, 'w') as f:
+            f.write("=== INICIO DE SIMULACIÓN ===\n")
 
     def plot_grilla_completa(self):
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
@@ -86,6 +90,12 @@ class Simulador:
         plt.title('Evolución de la Población Bacteriana')
         plt.show()
 
+    # Transcripción de mensaje de terminal en archivo txt
+    def escribir_log(self, mensaje):
+        print(mensaje)
+        with open(self.archivo_salida, 'a') as f:
+            f.write(mensaje + "\n")
+
     def actualizar_metricas(self, paso):
         bacterias = [b for b in self.ambiente.grilla.flatten() if isinstance(b, Bacteria)]
         self.metricas['total_bacterias'].append(len(bacterias))
@@ -93,8 +103,18 @@ class Simulador:
         self.metricas['resistentes'].append(sum(b.resistente for b in bacterias))
         self.metricas['nutrientes_promedio'].append(np.mean(self.ambiente.nutrientes))
         
-        print(f"\n=== Paso {paso+1} ===")
-        print(f"Bacterias totales: {len(bacterias)}")
-        print(f"Bacterias con consumo reducido: {self.metricas['consumo_reducido'][-1]}")
-        print(f"Bacterias resistentes: {self.metricas['resistentes'][-1]}")
-        print(f"Nutrientes promedio: {self.metricas['nutrientes_promedio'][-1]:.1f}")
+        mensaje = (f"\n=== Paso {paso+1} ===\n"
+                  f"Bacterias totales: {len(bacterias)}\n"
+                  f"Bacterias con consumo reducido: {self.metricas['consumo_reducido'][-1]}\n"
+                  f"Bacterias resistentes: {self.metricas['resistentes'][-1]}\n"
+                  f"Nutrientes promedio: {self.metricas['nutrientes_promedio'][-1]:.1f}")
+        
+        self.escribir_log(mensaje)  
+
+    def finalizar_simulacion(self):
+        resumen = ("\n=== Simulación completada ===\n"
+                  "\n=== Resumen Final ===\n"
+                  f"Mutaciones ocurridas: {self.metricas['mutaciones']}\n"
+                  f"Máximo consumo reducido: {max(self.metricas['consumo_reducido'])}")
+        
+        self.escribir_log(resumen)

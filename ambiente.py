@@ -106,9 +106,3 @@ class Colonia:
     
         # Actualizar nutrientes después de todo el paso
         self.ambiente.actualizar_nutrientes()
-
-    def reporte_estado():
-        pass
-
-    def exportar_csv():
-        pass

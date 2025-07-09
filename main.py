@@ -24,12 +24,12 @@ def crear_ambiente_con_bacterias(filas=5, columnas=5, num_bacterias=3):
     
     return ambiente
 
-def ejecutar_simulacion(filas=10, columnas=10, num_bacterias=10, pasos=5):
+def ejecutar_simulacion(filas=10, columnas=10, num_bacterias=10, pasos=5, archivo_salida="simulacion_log.txt"):
     ambiente = crear_ambiente_con_bacterias(filas, columnas, num_bacterias)
     colonia = Colonia(ambiente)
-    simulador = Simulador(ambiente)
+    simulador = Simulador(ambiente, archivo_salida)
     
-    print("=== Estado Inicial ===")
+    simulador.escribir_log("=== Estado Inicial ===")
     simulador.plot_grilla_completa()
 
     for paso in range(pasos):
@@ -37,11 +37,7 @@ def ejecutar_simulacion(filas=10, columnas=10, num_bacterias=10, pasos=5):
         simulador.actualizar_metricas(paso)
         simulador.plot_grilla_completa()
     
-    print("\n=== Simulación completada ===")
-    print("\n=== Resumen Final ===")
-    print(f"Mutaciones ocurridas: {simulador.metricas['mutaciones']}")
-    print(f"Máximo consumo reducido: {max(simulador.metricas['consumo_reducido'])}")
-    
+    simulador.finalizar_simulacion()
     simulador.graficar_evolucion()
 
 if __name__ == "__main__":
