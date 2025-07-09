@@ -117,10 +117,6 @@ def simulacion_completa(filas=10, columnas=10, num_bacterias=10, pasos=5):
         metricas['resistentes'].append(sum(b.resistente for b in bacterias))
         metricas['nutrientes_promedio'].append(np.mean(ambiente.nutrientes))
         
-        print(f"\n=== Paso {paso+1} ===")
-        print(f"Total: {len(bacterias)} | Consumo reducido: {metricas['consumo_reducido'][-1]}")
-        print(f"Resistentes: {metricas['resistentes'][-1]} | Nutrientes: {metricas['nutrientes_promedio'][-1]:.1f}")
-        
         plot_grilla_completa(ambiente)
 
         print(f"\n=== Paso {paso+1} ===")
@@ -151,7 +147,7 @@ if __name__ == "__main__":
     # Parámetros personalizables
     TAMAÑO_GRILLA = (10, 10)
     BACTERIAS_INICIALES = 20
-    PASOS_SIMULACION = 20
+    PASOS_SIMULACION = 5
     probabilidad_mutacion = 0.10
 
     # Ejecutar simulación

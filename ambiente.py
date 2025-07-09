@@ -5,12 +5,16 @@ import random
 class Ambiente:
     def __init__(self, filas, columnas):
         self.grilla = np.full((filas, columnas), None, dtype=object) #Grilla de tipo objetos sin nada
-        self.nutrientes = np.full((filas, columnas), 1000) #Grilla de nutrientes con valor 40
+        self.nutrientes = np.full((filas, columnas), 100.0) #Grilla de nutrientes con valor 40
         self.zona_antibiotica = np.zeros((filas, columnas), dtype=bool) # Grilla de tipo booleana de antibioticos
 
     def actualizar_nutrientes(self):
-        self.nutrientes -= 5 # Testeo simple de modificación de nutrientes
-        print (self.nutrientes)
+        self.nutrientes[self.nutrientes > 0] -= 1 # Consumo
+
+        # Regeneración de nutrientes en celdas
+        celdas_vacias = np.where(self.grilla == None)
+        self.nutrientes[celdas_vacias] += 0.5
+
         self.nutrientes[self.nutrientes < 0] = 0  # Evita que los nutrientes sean negativos
 
     def difundir_nutrientes(self):
@@ -51,7 +55,6 @@ class Ambiente:
 
 class Colonia:
     def __init__(self, ambiente):
-        self.bacterias = []
         self.ambiente = ambiente
 
     def ubicar_hija(self, madre_fila, madre_col, hija): # Ubica a hija en la grilla
@@ -82,13 +85,13 @@ class Colonia:
                 bacteria = self.ambiente.grilla[fila, col]
             
                 if isinstance(bacteria, Bacteria):
-                    # 1. Alimentarse de nutrientes disponibles
+                   # 1. Consumo de energía metabólica
+                    bacteria.consumir_energia()
+                   
+                    # 2. Alimentarse de nutrientes disponibles
                     nutrientes_celda = self.ambiente.nutrientes[fila, col]
                     consumo = bacteria.alimentar(nutrientes_celda)
                     self.ambiente.nutrientes[fila, col] -= consumo
-                
-                    # 2. Consumo de energía metabólica
-                    bacteria.consumir_energia()
                 
                     # 3. Reproducción
                     if bacteria.energia >= 60:
